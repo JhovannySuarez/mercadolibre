@@ -1,0 +1,173 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > DNAStatisticServiceImpl</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+    @import "../../.css/highlight-idea.css";
+  </style>
+  <script type="text/javascript" src="../../.js/highlight.pack.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mercadolibre.reto.xmen.services.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: DNAStatisticServiceImpl (com.mercadolibre.reto.xmen.services.impl)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DNAStatisticServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    66,7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76,5%
+  </span>
+  <span class="absValue">
+    (13/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DNAStatisticServiceImpl$$EnhancerBySpringCGLIB$$ff1d13fe</td>
+  </tr>
+  <tr>
+    <td class="name">DNAStatisticServiceImpl$$EnhancerBySpringCGLIB$$ff1d13fe$$FastClassBySpringCGLIB$$382e4d2b</td>
+  </tr>
+  <tr>
+    <td class="name">DNAStatisticServiceImpl$$FastClassBySpringCGLIB$$826ae742</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    66,7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76,5%
+  </span>
+  <span class="absValue">
+    (13/17)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<div class="sourceCode" id="sourceCode"><i class="no-highlight">1</i>&nbsp;package com.mercadolibre.reto.xmen.services.impl;
+<i class="no-highlight">2</i>&nbsp;
+<i class="no-highlight">3</i>&nbsp;import com.mercadolibre.reto.xmen.domain.DNAStatistic;
+<i class="no-highlight">4</i>&nbsp;import com.mercadolibre.reto.xmen.dto.DNAStatisticDTO;
+<i class="no-highlight">5</i>&nbsp;import com.mercadolibre.reto.xmen.repositories.DNAAnalysisRepository;
+<i class="no-highlight">6</i>&nbsp;import com.mercadolibre.reto.xmen.services.DNAStatisticService;
+<i class="no-highlight">7</i>&nbsp;import lombok.extern.slf4j.Slf4j;
+<i class="no-highlight">8</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i class="no-highlight">9</i>&nbsp;import org.springframework.cache.annotation.Cacheable;
+<i class="no-highlight">10</i>&nbsp;import org.springframework.stereotype.Service;
+<i class="no-highlight">11</i>&nbsp;
+<i class="no-highlight">12</i>&nbsp;import java.util.Optional;
+<i class="no-highlight">13</i>&nbsp;import java.util.UUID;
+<i class="no-highlight">14</i>&nbsp;
+<b class="fc"><i class="no-highlight">15</i>&nbsp;@Slf4j</b>
+<i class="no-highlight">16</i>&nbsp;@Service
+<b class="fc"><i class="no-highlight">17</i>&nbsp;public class DNAStatisticServiceImpl implements DNAStatisticService {</b>
+<i class="no-highlight">18</i>&nbsp;
+<i class="no-highlight">19</i>&nbsp;    @Autowired
+<i class="no-highlight">20</i>&nbsp;    private DNAAnalysisRepository dnaAnalysisRepository;
+<i class="no-highlight">21</i>&nbsp;
+<i class="no-highlight">22</i>&nbsp;    @Override
+<i class="no-highlight">23</i>&nbsp;    public DNAStatisticDTO getStatistics() {
+<b class="fc"><i class="no-highlight">24</i>&nbsp;        long totalRows = dnaAnalysisRepository.count();</b>
+<b class="fc"><i class="no-highlight">25</i>&nbsp;            long totalMutants = dnaAnalysisRepository.getMutantsCount();</b>
+<b class="fc"><i class="no-highlight">26</i>&nbsp;        long totalHumans = totalRows - totalMutants;</b>
+<b class="fc"><i class="no-highlight">27</i>&nbsp;        return DNAStatisticDTO.builder()</b>
+<b class="fc"><i class="no-highlight">28</i>&nbsp;                .countHumanDNA(totalHumans)</b>
+<b class="fc"><i class="no-highlight">29</i>&nbsp;                .countMutantDNA(totalMutants)</b>
+<b class="fc"><i class="no-highlight">30</i>&nbsp;                .ratio(getRatio(totalHumans, totalMutants))</b>
+<b class="fc"><i class="no-highlight">31</i>&nbsp;                .build();</b>
+<i class="no-highlight">32</i>&nbsp;    }
+<i class="no-highlight">33</i>&nbsp;
+<i class="no-highlight">34</i>&nbsp;    @Override
+<i class="no-highlight">35</i>&nbsp;    @Cacheable(cacheNames = &quot;stats&quot;, key = &quot;#analysisCode&quot;)
+<i class="no-highlight">36</i>&nbsp;    public Optional&lt;DNAStatistic&gt; getDnaStatistic(UUID analysisCode) {
+<b class="nc"><i class="no-highlight">37</i>&nbsp;        log.debug(&quot;Getting statistics from database&quot;);</b>
+<b class="nc"><i class="no-highlight">38</i>&nbsp;        return dnaAnalysisRepository.findById(analysisCode);</b>
+<i class="no-highlight">39</i>&nbsp;    }
+<i class="no-highlight">40</i>&nbsp;
+<i class="no-highlight">41</i>&nbsp;    @Override
+<i class="no-highlight">42</i>&nbsp;    public void saveDNAStatistic(DNAStatistic dnaStatistic){
+<b class="nc"><i class="no-highlight">43</i>&nbsp;        dnaAnalysisRepository.save(dnaStatistic);</b>
+<b class="nc"><i class="no-highlight">44</i>&nbsp;    }</b>
+<i class="no-highlight">45</i>&nbsp;
+<i class="no-highlight">46</i>&nbsp;    private Double getRatio(long countHumanDNA, long countMutantDNA) {
+<b class="fc"><i class="no-highlight">47</i>&nbsp;        if (countHumanDNA &gt; 0) {</b>
+<b class="fc"><i class="no-highlight">48</i>&nbsp;            return ((double) countMutantDNA / countHumanDNA);</b>
+<i class="no-highlight">49</i>&nbsp;        }
+<b class="fc"><i class="no-highlight">50</i>&nbsp;        return countMutantDNA != 0 ? 1d : 0d;</b>
+<i class="no-highlight">51</i>&nbsp;    }
+<i class="no-highlight">52</i>&nbsp;}
+</div>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+        var codeBlock = document.getElementById('sourceCode');
+
+        if (codeBlock) {
+            hljs.highlightBlock(codeBlock);
+        }
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2021-05-11 22:54</div>
+</div>
+</body>
+</html>

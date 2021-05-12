@@ -1,0 +1,362 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > DNAEvaluatorServiceImpl</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+    @import "../../.css/highlight-idea.css";
+  </style>
+  <script type="text/javascript" src="../../.js/highlight.pack.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mercadolibre.reto.xmen.services.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: DNAEvaluatorServiceImpl (com.mercadolibre.reto.xmen.services.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DNAEvaluatorServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (15/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97,1%
+  </span>
+  <span class="absValue">
+    (99/102)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<div class="sourceCode" id="sourceCode"><i class="no-highlight">1</i>&nbsp;package com.mercadolibre.reto.xmen.services.impl;
+<i class="no-highlight">2</i>&nbsp;
+<i class="no-highlight">3</i>&nbsp;import com.mercadolibre.reto.xmen.Utils.DNAUtil;
+<i class="no-highlight">4</i>&nbsp;import com.mercadolibre.reto.xmen.domain.DNAStatistic;
+<i class="no-highlight">5</i>&nbsp;import com.mercadolibre.reto.xmen.dto.DNARequestDTO;
+<i class="no-highlight">6</i>&nbsp;import com.mercadolibre.reto.xmen.exceptions.DNASequenceException;
+<i class="no-highlight">7</i>&nbsp;import com.mercadolibre.reto.xmen.services.DNAEvaluatorService;
+<i class="no-highlight">8</i>&nbsp;import com.mercadolibre.reto.xmen.services.DNAStatisticService;
+<i class="no-highlight">9</i>&nbsp;import lombok.NonNull;
+<i class="no-highlight">10</i>&nbsp;import lombok.extern.slf4j.Slf4j;
+<i class="no-highlight">11</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i class="no-highlight">12</i>&nbsp;import org.springframework.stereotype.Service;
+<i class="no-highlight">13</i>&nbsp;
+<i class="no-highlight">14</i>&nbsp;import java.util.Optional;
+<i class="no-highlight">15</i>&nbsp;import java.util.UUID;
+<i class="no-highlight">16</i>&nbsp;
+<b class="fc"><i class="no-highlight">17</i>&nbsp;@Slf4j</b>
+<i class="no-highlight">18</i>&nbsp;@Service
+<b class="fc"><i class="no-highlight">19</i>&nbsp;public class DNAEvaluatorServiceImpl implements DNAEvaluatorService {</b>
+<i class="no-highlight">20</i>&nbsp;
+<i class="no-highlight">21</i>&nbsp;    @Autowired
+<i class="no-highlight">22</i>&nbsp;    private DNAStatisticService dnaStatisticService;
+<i class="no-highlight">23</i>&nbsp;
+<i class="no-highlight">24</i>&nbsp;    public boolean isMutant(DNARequestDTO dnaRequestDTO) throws DNASequenceException {
+<b class="fc"><i class="no-highlight">25</i>&nbsp;        String[] dna = dnaRequestDTO.getDna();</b>
+<b class="fc"><i class="no-highlight">26</i>&nbsp;        if (dna != null) {</b>
+<b class="fc"><i class="no-highlight">27</i>&nbsp;            UUID dnaUUID = UUID.nameUUIDFromBytes(DNAUtil.dnaToBytes(dna));</b>
+<b class="fc"><i class="no-highlight">28</i>&nbsp;            Optional&lt;DNAStatistic&gt; dnaStatistic = dnaStatisticService.getDnaStatistic(dnaUUID);</b>
+<b class="fc"><i class="no-highlight">29</i>&nbsp;            if (dnaStatistic.isPresent())</b>
+<b class="nc"><i class="no-highlight">30</i>&nbsp;                return dnaStatistic.get().getIsMutant();</b>
+<i class="no-highlight">31</i>&nbsp;            else {
+<b class="fc"><i class="no-highlight">32</i>&nbsp;                return processDNA(dna,dnaUUID);</b>
+<i class="no-highlight">33</i>&nbsp;            }
+<i class="no-highlight">34</i>&nbsp;        } else {
+<b class="nc"><i class="no-highlight">35</i>&nbsp;            throw new DNASequenceException(&quot;Nitrogenous base not valid &quot;);</b>
+<i class="no-highlight">36</i>&nbsp;        }
+<i class="no-highlight">37</i>&nbsp;    }
+<i class="no-highlight">38</i>&nbsp;
+<i class="no-highlight">39</i>&nbsp;
+<i class="no-highlight">40</i>&nbsp;    private boolean processDNA(String[] dna, UUID dnaUUID) throws DNASequenceException {
+<i class="no-highlight">41</i>&nbsp;
+<b class="fc"><i class="no-highlight">42</i>&nbsp;        int mutantSubsequenceCount = 0;</b>
+<b class="fc"><i class="no-highlight">43</i>&nbsp;        for (int i = 0; i &lt; dna.length; i++) {</b>
+<b class="fc"><i class="no-highlight">44</i>&nbsp;            String dnaSequence = dna[i];</b>
+<b class="fc"><i class="no-highlight">45</i>&nbsp;            int j = 0;</b>
+<b class="fc"><i class="no-highlight">46</i>&nbsp;            if (dnaSequence == null)</b>
+<b class="fc"><i class="no-highlight">47</i>&nbsp;                continue;</b>
+<b class="fc"><i class="no-highlight">48</i>&nbsp;            while (j &lt; dnaSequence.length()) {</b>
+<i class="no-highlight">49</i>&nbsp;
+<b class="fc"><i class="no-highlight">50</i>&nbsp;                mutantSubsequenceCount += checkHorizontalSubSequence(dnaSequence, j, mutantSubsequenceCount);</b>
+<i class="no-highlight">51</i>&nbsp;
+<b class="fc"><i class="no-highlight">52</i>&nbsp;                if (dna.length - i &gt;= 4) {</b>
+<b class="fc"><i class="no-highlight">53</i>&nbsp;                    mutantSubsequenceCount += checkVerticalSubSequence(</b>
+<i class="no-highlight">54</i>&nbsp;                            dna[i], dna[i + 1], dna[i + 2], dna[i + 3], j, mutantSubsequenceCount);
+<b class="fc"><i class="no-highlight">55</i>&nbsp;                    mutantSubsequenceCount += checkObliquelyRightSubSequence(</b>
+<i class="no-highlight">56</i>&nbsp;                            dna[i], dna[i + 1], dna[i + 2], dna[i + 3], j, mutantSubsequenceCount);
+<i class="no-highlight">57</i>&nbsp;
+<b class="fc"><i class="no-highlight">58</i>&nbsp;                    mutantSubsequenceCount += checkObliquelyLeftSubSequence(</b>
+<i class="no-highlight">59</i>&nbsp;                            dna[i], dna[i + 1], dna[i + 2], dna[i + 3], j, mutantSubsequenceCount);
+<i class="no-highlight">60</i>&nbsp;                }
+<b class="fc"><i class="no-highlight">61</i>&nbsp;                if (mutantSubsequenceCount == 2) {</b>
+<b class="fc"><i class="no-highlight">62</i>&nbsp;                    saveStatistics(true, dnaUUID);</b>
+<b class="fc"><i class="no-highlight">63</i>&nbsp;                    return true;</b>
+<i class="no-highlight">64</i>&nbsp;                }
+<b class="fc"><i class="no-highlight">65</i>&nbsp;                j++;</b>
+<i class="no-highlight">66</i>&nbsp;            }
+<i class="no-highlight">67</i>&nbsp;        }
+<b class="fc"><i class="no-highlight">68</i>&nbsp;        saveStatistics(false, dnaUUID);</b>
+<b class="fc"><i class="no-highlight">69</i>&nbsp;        return false;</b>
+<i class="no-highlight">70</i>&nbsp;    }
+<i class="no-highlight">71</i>&nbsp;
+<i class="no-highlight">72</i>&nbsp;    /**
+<i class="no-highlight">73</i>&nbsp;     * This method gets the horizontal subsequence since the current index up to 4 and evaluate it to check
+<i class="no-highlight">74</i>&nbsp;     * whether the subsequence is mutant or not
+<i class="no-highlight">75</i>&nbsp;     *
+<i class="no-highlight">76</i>&nbsp;     * @param dnaSequence            the current dna sequence row being evaluated
+<i class="no-highlight">77</i>&nbsp;     * @param currentIndex           The current index to get the subsequence to be evaluated
+<i class="no-highlight">78</i>&nbsp;     * @param mutantSubsequenceCount if mutantSubsequenceCount is 2 or upper, it is not necessary to check
+<i class="no-highlight">79</i>&nbsp;     * @return 1 if the evaluation of the subsequence is mutant, 0 otherwise
+<i class="no-highlight">80</i>&nbsp;     * @throws DNASequenceException if the horizontal subsequence is not a valid ADN sequence
+<i class="no-highlight">81</i>&nbsp;     */
+<b class="fc"><i class="no-highlight">82</i>&nbsp;    private int checkHorizontalSubSequence(@NonNull final String dnaSequence, int currentIndex, int mutantSubsequenceCount) throws DNASequenceException {</b>
+<b class="fc"><i class="no-highlight">83</i>&nbsp;        int border = currentIndex + 4;</b>
+<b class="fc"><i class="no-highlight">84</i>&nbsp;        if (border &lt;= dnaSequence.length() &amp;&amp; mutantSubsequenceCount &lt; 2) {</b>
+<b class="fc"><i class="no-highlight">85</i>&nbsp;            String horizontalSubSequence = getHorizontalSubSequence(dnaSequence, currentIndex);</b>
+<b class="fc"><i class="no-highlight">86</i>&nbsp;            isValidSequence(horizontalSubSequence);</b>
+<b class="fc"><i class="no-highlight">87</i>&nbsp;            if (isMutantSubSequence(horizontalSubSequence)) {</b>
+<b class="fc"><i class="no-highlight">88</i>&nbsp;                return 1;</b>
+<i class="no-highlight">89</i>&nbsp;            }
+<i class="no-highlight">90</i>&nbsp;        }
+<b class="fc"><i class="no-highlight">91</i>&nbsp;        return 0;</b>
+<i class="no-highlight">92</i>&nbsp;    }
+<i class="no-highlight">93</i>&nbsp;
+<i class="no-highlight">94</i>&nbsp;    /**
+<i class="no-highlight">95</i>&nbsp;     * @param dnaSequence  dnaSequence to be evaulated.
+<i class="no-highlight">96</i>&nbsp;     * @param currentIndex The current index to get the subsequence to be evaluated
+<i class="no-highlight">97</i>&nbsp;     * @return the horizontal subsequence since the currentIndex until 4 positions forward
+<i class="no-highlight">98</i>&nbsp;     */
+<b class="fc"><i class="no-highlight">99</i>&nbsp;    private String getHorizontalSubSequence(@NonNull final String dnaSequence, int currentIndex) {</b>
+<b class="fc"><i class="no-highlight">100</i>&nbsp;        return dnaSequence.substring(currentIndex, currentIndex + 4);</b>
+<i class="no-highlight">101</i>&nbsp;    }
+<i class="no-highlight">102</i>&nbsp;
+<i class="no-highlight">103</i>&nbsp;    /**
+<i class="no-highlight">104</i>&nbsp;     * This method gets the vertical subsequence since the current index up to 4 rows below and evaluate it to check
+<i class="no-highlight">105</i>&nbsp;     * whether the subsequence is mutant or not
+<i class="no-highlight">106</i>&nbsp;     *
+<i class="no-highlight">107</i>&nbsp;     * @param row1                   Row to get fist base of the subsequence
+<i class="no-highlight">108</i>&nbsp;     * @param row2                   Row to get second base of the subsequence
+<i class="no-highlight">109</i>&nbsp;     * @param row3                   Row to get third base of the subsequence
+<i class="no-highlight">110</i>&nbsp;     * @param row4                   Row to get fourth base of the subsequence
+<i class="no-highlight">111</i>&nbsp;     * @param currentIndex           The current column index to get the subsequence to be evaluated
+<i class="no-highlight">112</i>&nbsp;     * @param mutantSubsequenceCount if mutantSubsequenceCount is 2 or upper, it is not necessary to check
+<i class="no-highlight">113</i>&nbsp;     * @return 1 if the evaluation of the subsequence is mutant, 0 otherwise
+<i class="no-highlight">114</i>&nbsp;     * @throws DNASequenceException if vertical subsequence contains a not valid ADN nitrogenous base
+<i class="no-highlight">115</i>&nbsp;     */
+<b class="fc"><i class="no-highlight">116</i>&nbsp;    private int checkVerticalSubSequence(@NonNull final String row1, @NonNull final String row2,</b>
+<b class="fc"><i class="no-highlight">117</i>&nbsp;                                         @NonNull final String row3, @NonNull final String row4, int currentIndex, int mutantSubsequenceCount) throws DNASequenceException {</b>
+<i class="no-highlight">118</i>&nbsp;
+<b class="fc"><i class="no-highlight">119</i>&nbsp;        if (mutantSubsequenceCount &lt; 2) {</b>
+<b class="fc"><i class="no-highlight">120</i>&nbsp;            if (row1.length() &gt;= currentIndex &amp;&amp; row2.length() &gt;= currentIndex &amp;&amp; row3.length() &gt;= currentIndex &amp;&amp; row4.length() &gt;= currentIndex) {</b>
+<b class="fc"><i class="no-highlight">121</i>&nbsp;                String verticalSubSequence = getVerticalSubSequence(row1, row2, row3, row4, currentIndex);</b>
+<b class="fc"><i class="no-highlight">122</i>&nbsp;                isValidSequence(verticalSubSequence);</b>
+<b class="fc"><i class="no-highlight">123</i>&nbsp;                if (isMutantSubSequence(verticalSubSequence)) {</b>
+<b class="fc"><i class="no-highlight">124</i>&nbsp;                    return 1;</b>
+<i class="no-highlight">125</i>&nbsp;                }
+<i class="no-highlight">126</i>&nbsp;            }
+<i class="no-highlight">127</i>&nbsp;        }
+<b class="fc"><i class="no-highlight">128</i>&nbsp;        return 0;</b>
+<i class="no-highlight">129</i>&nbsp;    }
+<i class="no-highlight">130</i>&nbsp;
+<i class="no-highlight">131</i>&nbsp;    /**
+<i class="no-highlight">132</i>&nbsp;     * @param row1         Row to get fist base of the subsequence
+<i class="no-highlight">133</i>&nbsp;     * @param row2         Row to get second base of the subsequence
+<i class="no-highlight">134</i>&nbsp;     * @param row3         Row to get third base of the subsequence
+<i class="no-highlight">135</i>&nbsp;     * @param row4         Row to get fourth base of the subsequence
+<i class="no-highlight">136</i>&nbsp;     * @param currentIndex The current index to get the subsequence to be evaluated
+<i class="no-highlight">137</i>&nbsp;     * @return the vertical subsequence in the column &#39;currentIndex&#39;
+<i class="no-highlight">138</i>&nbsp;     */
+<b class="fc"><i class="no-highlight">139</i>&nbsp;    private String getVerticalSubSequence(@NonNull final String row1, @NonNull final String row2,</b>
+<b class="fc"><i class="no-highlight">140</i>&nbsp;                                          @NonNull final String row3, @NonNull final String row4, int currentIndex) {</b>
+<b class="fc"><i class="no-highlight">141</i>&nbsp;        StringBuilder subsequence = new StringBuilder();</b>
+<b class="fc"><i class="no-highlight">142</i>&nbsp;        subsequence.append(row1.charAt(currentIndex))</b>
+<b class="fc"><i class="no-highlight">143</i>&nbsp;                .append(row2.charAt(currentIndex))</b>
+<b class="fc"><i class="no-highlight">144</i>&nbsp;                .append(row3.charAt(currentIndex))</b>
+<b class="fc"><i class="no-highlight">145</i>&nbsp;                .append(row4.charAt(currentIndex));</b>
+<b class="fc"><i class="no-highlight">146</i>&nbsp;        return subsequence.toString();</b>
+<i class="no-highlight">147</i>&nbsp;    }
+<i class="no-highlight">148</i>&nbsp;
+<i class="no-highlight">149</i>&nbsp;    /**
+<i class="no-highlight">150</i>&nbsp;     * @param row1         Row to get fist base of the subsequence
+<i class="no-highlight">151</i>&nbsp;     * @param row2         Row to get second base of the subsequence
+<i class="no-highlight">152</i>&nbsp;     * @param row3         Row to get third base of the subsequence
+<i class="no-highlight">153</i>&nbsp;     * @param row4         Row to get fourth base of the subsequence
+<i class="no-highlight">154</i>&nbsp;     * @param currentIndex The current index to get the subsequence to be evaluated
+<i class="no-highlight">155</i>&nbsp;     * @return 1 if the evaluation of the subsequence is mutant, 0 otherwise
+<i class="no-highlight">156</i>&nbsp;     */
+<b class="fc"><i class="no-highlight">157</i>&nbsp;    private int checkObliquelyRightSubSequence(@NonNull final String row1, @NonNull final String row2,</b>
+<b class="fc"><i class="no-highlight">158</i>&nbsp;                                               @NonNull final String row3, @NonNull final String row4, int currentIndex,</b>
+<i class="no-highlight">159</i>&nbsp;                                               int mutantSubsequenceCount) throws DNASequenceException {
+<b class="fc"><i class="no-highlight">160</i>&nbsp;        int border = currentIndex + 4;</b>
+<b class="fc"><i class="no-highlight">161</i>&nbsp;        if (mutantSubsequenceCount &lt; 2) { //if mutantSubsequenceCount is 2 or upper, it is not necessary to check</b>
+<b class="fc"><i class="no-highlight">162</i>&nbsp;            if (row1.length() &gt;= border &amp;&amp; row2.length() &gt;= border &amp;&amp; row3.length() &gt;= border &amp;&amp; row4.length() &gt;= border) {</b>
+<b class="fc"><i class="no-highlight">163</i>&nbsp;                String obliquelyRight = getObliquelyRightSubSequence(row1, row2, row3, row4, currentIndex);</b>
+<b class="fc"><i class="no-highlight">164</i>&nbsp;                isValidSequence(obliquelyRight);</b>
+<b class="fc"><i class="no-highlight">165</i>&nbsp;                if (isMutantSubSequence(obliquelyRight)) {</b>
+<b class="fc"><i class="no-highlight">166</i>&nbsp;                    return 1;</b>
+<i class="no-highlight">167</i>&nbsp;                }
+<i class="no-highlight">168</i>&nbsp;            }
+<i class="no-highlight">169</i>&nbsp;        }
+<b class="fc"><i class="no-highlight">170</i>&nbsp;        return 0;</b>
+<i class="no-highlight">171</i>&nbsp;    }
+<i class="no-highlight">172</i>&nbsp;
+<i class="no-highlight">173</i>&nbsp;    /**
+<i class="no-highlight">174</i>&nbsp;     * @param row1         Row to get fist base of the subsequence
+<i class="no-highlight">175</i>&nbsp;     * @param row2         Row to get second base of the subsequence
+<i class="no-highlight">176</i>&nbsp;     * @param row3         Row to get third base of the subsequence
+<i class="no-highlight">177</i>&nbsp;     * @param row4         Row to get fourth base of the subsequence
+<i class="no-highlight">178</i>&nbsp;     * @param currentIndex The current index to get the subsequence to be evaluated
+<i class="no-highlight">179</i>&nbsp;     * @return the Oblique right subsequence since the column &#39;currentIndex&#39; until &#39;currentIndex&#39; + 3
+<i class="no-highlight">180</i>&nbsp;     */
+<b class="fc"><i class="no-highlight">181</i>&nbsp;    private String getObliquelyRightSubSequence(@NonNull final String row1, @NonNull final String row2,</b>
+<b class="fc"><i class="no-highlight">182</i>&nbsp;                                                @NonNull final String row3, @NonNull final String row4, int currentIndex) {</b>
+<b class="fc"><i class="no-highlight">183</i>&nbsp;        StringBuilder subsequence = new StringBuilder();</b>
+<b class="fc"><i class="no-highlight">184</i>&nbsp;        subsequence.append(row1.charAt(currentIndex))</b>
+<b class="fc"><i class="no-highlight">185</i>&nbsp;                .append(row2.charAt(currentIndex + 1))</b>
+<b class="fc"><i class="no-highlight">186</i>&nbsp;                .append(row3.charAt(currentIndex + 2))</b>
+<b class="fc"><i class="no-highlight">187</i>&nbsp;                .append(row4.charAt(currentIndex + 3));</b>
+<b class="fc"><i class="no-highlight">188</i>&nbsp;        return subsequence.toString();</b>
+<i class="no-highlight">189</i>&nbsp;    }
+<i class="no-highlight">190</i>&nbsp;
+<i class="no-highlight">191</i>&nbsp;    /**
+<i class="no-highlight">192</i>&nbsp;     * @param row1         Row to get fist base of the subsequence
+<i class="no-highlight">193</i>&nbsp;     * @param row2         Row to get second base of the subsequence
+<i class="no-highlight">194</i>&nbsp;     * @param row3         Row to get third base of the subsequence
+<i class="no-highlight">195</i>&nbsp;     * @param row4         Row to get fourth base of the subsequence
+<i class="no-highlight">196</i>&nbsp;     * @param currentIndex The current index to get the subsequence to be evaluated
+<i class="no-highlight">197</i>&nbsp;     * @return the Oblique left subsequence since the column &#39;currentIndex&#39; until &#39;currentIndex&#39; - 3
+<i class="no-highlight">198</i>&nbsp;     */
+<b class="fc"><i class="no-highlight">199</i>&nbsp;    private int checkObliquelyLeftSubSequence(@NonNull final String row1, @NonNull final String row2,</b>
+<b class="fc"><i class="no-highlight">200</i>&nbsp;                                              @NonNull final String row3, @NonNull final String row4, int currentIndex, int mutantSubsequenceCount)</b>
+<i class="no-highlight">201</i>&nbsp;            throws DNASequenceException {
+<i class="no-highlight">202</i>&nbsp;
+<b class="fc"><i class="no-highlight">203</i>&nbsp;        if (mutantSubsequenceCount &lt; 2) { //if mutantSubsequenceCount is 2 or upper, it is not necessary to check</b>
+<b class="fc"><i class="no-highlight">204</i>&nbsp;            if (currentIndex &gt;= 3 &amp;&amp; row1.length() &gt;= currentIndex + 1 &amp;&amp; row2.length() &gt;= currentIndex &amp;&amp; row3.length() &gt;= currentIndex - 1 &amp;&amp; row3.length() &gt;= currentIndex - 2) {</b>
+<b class="fc"><i class="no-highlight">205</i>&nbsp;                String obliquelyLeft = getObliquelyLeftSubSequence(row1, row2, row3, row4, currentIndex);</b>
+<b class="fc"><i class="no-highlight">206</i>&nbsp;                isValidSequence(obliquelyLeft);</b>
+<b class="fc"><i class="no-highlight">207</i>&nbsp;                if (isMutantSubSequence(obliquelyLeft)) {</b>
+<b class="fc"><i class="no-highlight">208</i>&nbsp;                    return 1;</b>
+<i class="no-highlight">209</i>&nbsp;                }
+<i class="no-highlight">210</i>&nbsp;            }
+<i class="no-highlight">211</i>&nbsp;        }
+<b class="fc"><i class="no-highlight">212</i>&nbsp;        return 0;</b>
+<i class="no-highlight">213</i>&nbsp;    }
+<i class="no-highlight">214</i>&nbsp;
+<b class="fc"><i class="no-highlight">215</i>&nbsp;    private String getObliquelyLeftSubSequence(@NonNull final String row1, @NonNull final String row2,</b>
+<b class="fc"><i class="no-highlight">216</i>&nbsp;                                               @NonNull final String row3, @NonNull final String row4, int j) {</b>
+<b class="fc"><i class="no-highlight">217</i>&nbsp;        StringBuilder subsequence = new StringBuilder();</b>
+<b class="fc"><i class="no-highlight">218</i>&nbsp;        subsequence.append(row1.charAt(j))</b>
+<b class="fc"><i class="no-highlight">219</i>&nbsp;                .append(row2.charAt(j - 1))</b>
+<b class="fc"><i class="no-highlight">220</i>&nbsp;                .append(row3.charAt(j - 2))</b>
+<b class="fc"><i class="no-highlight">221</i>&nbsp;                .append(row4.charAt(j - 3));</b>
+<b class="fc"><i class="no-highlight">222</i>&nbsp;        return subsequence.toString();</b>
+<i class="no-highlight">223</i>&nbsp;    }
+<i class="no-highlight">224</i>&nbsp;
+<i class="no-highlight">225</i>&nbsp;    /**
+<i class="no-highlight">226</i>&nbsp;     * check whether the subSequence is mutant or not
+<i class="no-highlight">227</i>&nbsp;     *
+<i class="no-highlight">228</i>&nbsp;     * @param subSequence to be evaluated
+<i class="no-highlight">229</i>&nbsp;     * @return true if the all nitrogenous base of the subsequence are equal false otherwise
+<i class="no-highlight">230</i>&nbsp;     */
+<i class="no-highlight">231</i>&nbsp;    private boolean isMutantSubSequence(String subSequence) {
+<b class="fc"><i class="no-highlight">232</i>&nbsp;        if (subSequence != null &amp;&amp; subSequence.length() == 4) {</b>
+<b class="fc"><i class="no-highlight">233</i>&nbsp;            return subSequence.chars().distinct().count() == 1;</b>
+<i class="no-highlight">234</i>&nbsp;        }
+<b class="nc"><i class="no-highlight">235</i>&nbsp;        return false;</b>
+<i class="no-highlight">236</i>&nbsp;    }
+<i class="no-highlight">237</i>&nbsp;
+<i class="no-highlight">238</i>&nbsp;    /**
+<i class="no-highlight">239</i>&nbsp;     * Evaluated if the all nitrogenous base of the subsequence ara valid [ATCG]
+<i class="no-highlight">240</i>&nbsp;     *
+<i class="no-highlight">241</i>&nbsp;     * @param dnaSequenceRow the ADN sequence to be validated
+<i class="no-highlight">242</i>&nbsp;     * @throws DNASequenceException if vertical subsequence contains a not valid ADN nitrogenous base
+<i class="no-highlight">243</i>&nbsp;     */
+<i class="no-highlight">244</i>&nbsp;    private void isValidSequence(String dnaSequenceRow) throws DNASequenceException {
+<b class="fc"><i class="no-highlight">245</i>&nbsp;        if (dnaSequenceRow == null || !dnaSequenceRow.matches(&quot;[ATCGatcg]+&quot;)) {</b>
+<b class="fc"><i class="no-highlight">246</i>&nbsp;            throw new DNASequenceException(&quot;Nitrogenous base not valid &quot; + dnaSequenceRow);</b>
+<i class="no-highlight">247</i>&nbsp;        }
+<b class="fc"><i class="no-highlight">248</i>&nbsp;    }</b>
+<i class="no-highlight">249</i>&nbsp;
+<i class="no-highlight">250</i>&nbsp;    private void saveStatistics(boolean isMutant, UUID dnaUUID) {
+<b class="fc"><i class="no-highlight">251</i>&nbsp;        DNAStatistic dnaStatistic = DNAStatistic.builder().</b>
+<b class="fc"><i class="no-highlight">252</i>&nbsp;                isMutant(isMutant)</b>
+<b class="fc"><i class="no-highlight">253</i>&nbsp;                .analysisCode(dnaUUID)</b>
+<b class="fc"><i class="no-highlight">254</i>&nbsp;                .build();</b>
+<b class="fc"><i class="no-highlight">255</i>&nbsp;        dnaStatisticService.saveDNAStatistic(dnaStatistic);</b>
+<b class="fc"><i class="no-highlight">256</i>&nbsp;    }</b>
+<i class="no-highlight">257</i>&nbsp;}
+</div>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+        var codeBlock = document.getElementById('sourceCode');
+
+        if (codeBlock) {
+            hljs.highlightBlock(codeBlock);
+        }
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2021-05-11 22:54</div>
+</div>
+</body>
+</html>

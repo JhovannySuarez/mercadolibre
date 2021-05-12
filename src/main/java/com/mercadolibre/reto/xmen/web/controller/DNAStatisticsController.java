@@ -2,6 +2,7 @@ package com.mercadolibre.reto.xmen.web.controller;
 
 import com.mercadolibre.reto.xmen.dto.DNAStatisticDTO;
 import com.mercadolibre.reto.xmen.services.DNAStatisticService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ public class DNAStatisticsController {
     @Autowired
     private DNAStatisticService dnaStatisticService;
 
+    @ApiOperation(value = "Return the stats of the ADN verifications ")
     @GetMapping("/")
     public ResponseEntity<DNAStatisticDTO> getStatistics() {
 
