@@ -1,9 +1,11 @@
 package com.mercadolibre.reto.xmen.services.impl;
 
+import com.mercadolibre.reto.xmen.domain.DNAStatistic;
 import com.mercadolibre.reto.xmen.dto.DNARequestDTO;
 import com.mercadolibre.reto.xmen.exceptions.DNASequenceException;
 import com.mercadolibre.reto.xmen.repositories.DNAAnalysisRepository;
 import com.mercadolibre.reto.xmen.services.DNAEvaluatorService;
+import com.mercadolibre.reto.xmen.services.DNAStatisticService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +22,9 @@ class DNAEvaluatorServiceImplTest {
 
     @MockBean
     private DNAAnalysisRepository dnaAnalysisRepository;
+
+    @MockBean
+    private DNAStatisticService dnaStatisticService;
 
     @Autowired
     private DNAEvaluatorService dnaEvaluatorService;
@@ -89,6 +94,10 @@ class DNAEvaluatorServiceImplTest {
 
     private DNARequestDTO getDNARequestDTO(String[] dna) {
         return DNARequestDTO.builder().dna(dna).build();
+    }
+
+    private DNAStatistic getDNAStatistic(boolean isMutant) {
+        return DNAStatistic.builder().isMutant(isMutant).build();
     }
 
 }

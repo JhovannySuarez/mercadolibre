@@ -4,13 +4,14 @@ import com.mercadolibre.reto.xmen.Utils.DNAUtil;
 import com.mercadolibre.reto.xmen.domain.DNAStatistic;
 import com.mercadolibre.reto.xmen.dto.DNARequestDTO;
 import com.mercadolibre.reto.xmen.exceptions.DNASequenceException;
-import com.mercadolibre.reto.xmen.repositories.DNAAnalysisRepository;
 import com.mercadolibre.reto.xmen.services.DNAEvaluatorService;
+import com.mercadolibre.reto.xmen.services.DNAStatisticService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -18,40 +19,53 @@ import java.util.UUID;
 public class DNAEvaluatorServiceImpl implements DNAEvaluatorService {
 
     @Autowired
-    private DNAAnalysisRepository dnaAnalysisRepository;
-
+    private DNAStatisticService dnaStatisticService;
 
     public boolean isMutant(DNARequestDTO dnaRequestDTO) throws DNASequenceException {
         String[] dna = dnaRequestDTO.getDna();
         if (dna != null) {
-            int mutantSubsequenceCount = 0;
-            for (int i = 0; i < dna.length; i++) {
-                String dnaSequence = dna[i];
-                int j = 0;
-                if(dnaSequence == null )
-                    continue;
-                while (j < dnaSequence.length()) {
+            UUID dnaUUID = UUID.nameUUIDFromBytes(DNAUtil.dnaToBytes(dna));
+            Optional<DNAStatistic> dnaStatistic = dnaStatisticService.getDnaStatistic(dnaUUID);
+            if (dnaStatistic.isPresent())
+                return dnaStatistic.get().getIsMutant();
+            else {
+                return processDNA(dna,dnaUUID);
+            }
+        } else {
+            throw new DNASequenceException("Nitrogenous base not valid ");
+        }
+    }
 
-                    mutantSubsequenceCount += checkHorizontalSubSequence(dnaSequence, j, mutantSubsequenceCount);
 
-                    if (dna.length - i >= 4) {
-                        mutantSubsequenceCount += checkVerticalSubSequence(
-                                dna[i], dna[i + 1], dna[i + 2], dna[i + 3], j, mutantSubsequenceCount);
-                        mutantSubsequenceCount += checkObliquelyRightSubSequence(
-                                dna[i], dna[i + 1], dna[i + 2], dna[i + 3], j, mutantSubsequenceCount);
+    private boolean processDNA(String[] dna, UUID dnaUUID) throws DNASequenceException {
 
-                        mutantSubsequenceCount += checkObliquelyLeftSubSequence(
-                                dna[i], dna[i + 1], dna[i + 2], dna[i + 3], j, mutantSubsequenceCount);
-                    }
-                    if (mutantSubsequenceCount == 2) {
-                        saveStatistics(true, dna);
-                        return true;
-                    }
-                    j++;
+        int mutantSubsequenceCount = 0;
+        for (int i = 0; i < dna.length; i++) {
+            String dnaSequence = dna[i];
+            int j = 0;
+            if (dnaSequence == null)
+                continue;
+            while (j < dnaSequence.length()) {
+
+                mutantSubsequenceCount += checkHorizontalSubSequence(dnaSequence, j, mutantSubsequenceCount);
+
+                if (dna.length - i >= 4) {
+                    mutantSubsequenceCount += checkVerticalSubSequence(
+                            dna[i], dna[i + 1], dna[i + 2], dna[i + 3], j, mutantSubsequenceCount);
+                    mutantSubsequenceCount += checkObliquelyRightSubSequence(
+                            dna[i], dna[i + 1], dna[i + 2], dna[i + 3], j, mutantSubsequenceCount);
+
+                    mutantSubsequenceCount += checkObliquelyLeftSubSequence(
+                            dna[i], dna[i + 1], dna[i + 2], dna[i + 3], j, mutantSubsequenceCount);
                 }
+                if (mutantSubsequenceCount == 2) {
+                    saveStatistics(true, dnaUUID);
+                    return true;
+                }
+                j++;
             }
         }
-        saveStatistics(false, dna);
+        saveStatistics(false, dnaUUID);
         return false;
     }
 
@@ -157,10 +171,10 @@ public class DNAEvaluatorServiceImpl implements DNAEvaluatorService {
     }
 
     /**
-     * @param row1        Row to get fist base of the subsequence
-     * @param row2        Row to get second base of the subsequence
-     * @param row3        Row to get third base of the subsequence
-     * @param row4        Row to get fourth base of the subsequence
+     * @param row1         Row to get fist base of the subsequence
+     * @param row2         Row to get second base of the subsequence
+     * @param row3         Row to get third base of the subsequence
+     * @param row4         Row to get fourth base of the subsequence
      * @param currentIndex The current index to get the subsequence to be evaluated
      * @return the Oblique right subsequence since the column 'currentIndex' until 'currentIndex' + 3
      */
@@ -233,11 +247,11 @@ public class DNAEvaluatorServiceImpl implements DNAEvaluatorService {
         }
     }
 
-    private void saveStatistics(boolean isMutant, String[] dna) {
+    private void saveStatistics(boolean isMutant, UUID dnaUUID) {
         DNAStatistic dnaStatistic = DNAStatistic.builder().
                 isMutant(isMutant)
-                .analysisCode(UUID.nameUUIDFromBytes(DNAUtil.dnaToBytes(dna)))//A unique ID is created to the ADN getting the bytes
+                .analysisCode(dnaUUID)
                 .build();
-        dnaAnalysisRepository.save(dnaStatistic);
+        dnaStatisticService.saveDNAStatistic(dnaStatistic);
     }
 }
