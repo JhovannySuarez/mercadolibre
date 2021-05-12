@@ -8,11 +8,21 @@
 		<version>2.4.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.mercadolibre.reto.xmen</groupId>
 	<artifactId>reto-xmen</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>reto-xmen</name>
 	<description>Project to solve the  Mercado libre technical test </description>
+
+	<repositories>
+		<repository>
+			<id>jcenter-snapshots</id>
+			<name>jcenter</name>
+			<url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
+		</repository>
+	</repositories>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -58,12 +68,14 @@
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>3.0.0-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-boot-starter</artifactId>
 			<version>3.0.0</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
