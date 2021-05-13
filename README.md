@@ -52,7 +52,9 @@ Después de realizar estos pasos, el proyecto estará listo para ser probado con
 
 
 Los links de la documentación 
-* [Links](https://xmen-challenge-ml.herokuapp.com/links.html)
+* [Coverage](https://xmen-challenge-ml.herokuapp.com/coverage/index.html)
+* [Swagger](https://xmen-challenge-ml.herokuapp.com/swagger-ui/)
+
 
 
 
